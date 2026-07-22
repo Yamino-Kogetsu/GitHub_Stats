@@ -14,14 +14,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Sync with upstream
+      - name: Sync fork
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          curl \
-            -L \
+          RESPONSE=$(curl -s \
             -X POST \
             -H "Accept: application/vnd.github+json" \
             -H "Authorization: Bearer $GH_TOKEN" \
             https://api.github.com/repos/Yamino-Kogetsu/GitHub_Stats/merge-upstream \
-            -d '{"branch":"master"}'
+            -d '{"branch":"master"}')
+
+          echo "$RESPONSE"
+
+          if echo "$RESPONSE" | grep -q '"merge_type":"none"'; then
+            echo "✅ Already up-to-date."
+          else
+            echo "🚀 Fork synchronized successfully."
+          fi
